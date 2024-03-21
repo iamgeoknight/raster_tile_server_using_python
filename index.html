@@ -1,0 +1,85 @@
+<html>
+
+<head>
+    <title>Vector Tile</title>
+    <script src="cdn/ol.js"></script>
+    <link rel="stylesheet" href="cdn/ol.css">
+    <link rel="stylesheet" href="cdn/style.css">
+</head>
+
+<body>
+    <div id="map">
+        <div id="popup"></div>
+    </div>
+</body>
+<script>
+
+
+
+    var style_simple = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: '#ADD8E6'
+        }),
+        stroke: new ol.style.Stroke({
+            color: '#880000',
+            width: 5
+        })
+    });
+
+    let osmLayer = new ol.layer.Tile({
+        source: new ol.source.OSM()
+    })
+
+    let vectortile_layer = new ol.layer.VectorTile({
+        style: style_simple,
+        source: new ol.source.VectorTile({
+            tilePixelRatio: 1, // oversampling when > 1
+            tileGrid: ol.tilegrid.createXYZ({ maxZoom: 19 }),
+            format: new ol.format.MVT(),
+            url: 'tiles/{z}/{x}/{y}.mvt'
+        }),
+        minZoom: 12,
+        maxZoom: 18
+    });
+
+
+    // Create vector layer for highlighting the feature on popup click
+    let selectionLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({}),
+        name: 'selectionLayer',
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'red',
+                width: 10,
+            }),
+            fill: new ol.style.Fill({
+                color: 'rgba(200,20,20,0.4)',
+            }),
+        })
+    });
+
+
+    var layer = 'postgres:germany_landuse_4326';
+    var projection_epsg_no = '4326';
+    var map = new ol.Map({
+        target: 'map',
+        view: new ol.View({
+            center: [
+                8542295.27212957, 3595868.3527581077],
+            zoom: 6,
+            // minZoom: 10,
+            maxZoom: 13
+        }),
+        layers: [
+            osmLayer,
+            new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'http://0.0.0.0:8000/tiles/{z}/{x}/{y}.png',
+                }),
+            })
+        ]
+    });
+
+</script>
+
+</html>
